@@ -1,13 +1,29 @@
-body {
+#body {
 	margin: 0px;
 	padding: 0px;
+	margin-top:80px;
+	margin-bottom:40px;
 	background-color:lightgray
 }
-h1 {
-	color:blue;
+h1.h1 {
+	color:darkblue;
 	text-align: center;
 }
-canvas {
+header {
+	position:fixed;
+	top:0;
+	height:80px;
+	width:100%;
+	background-color:lightblue
+}
+footer {
+	background-color:lightblue;
+	height:40px;
+	width: 100%;
+	bottom: 0;
+	position: fixed
+}
+#gameCanvas {
 	padding: 0;
 	margin: auto;
 	display: block;

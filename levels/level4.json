@@ -1,0 +1,15 @@
+{
+	"levelName":"Repition of the substring \"blue red red blue blue\"",
+	"numColumns":13,
+	"numRows":10,
+	"numBlue":10,
+	"numRed":10,
+	"numFree":30,
+	"acceptConditions":"ACCEPT: any color string made up of copies of the substring \"blue red red blue blue\"",
+	"mazeMaps":[{"exit":true,"path":["blue","red","red","blue","blue"]},
+	{"exit":false,"path":["blue","red","blue","red","blue"]},
+	{"exit":false,"path":["blue","red","red","blue","blue","blue","red","red","blue","red"]},
+	{"exit":true,"path":["blue","red","red","blue","blue","blue","red","red","blue","blue"]},
+	{"exit":false,"path":["blue","red","red","blue","blue","blue","red","red"]},
+	{"exit":true,"path":["blue","red","red","blue","blue","blue","red","red","blue","blue","blue","red","red","blue","blue"]}]
+}

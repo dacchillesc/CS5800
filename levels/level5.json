@@ -1,0 +1,13 @@
+{
+	"levelName":"3N + 2 reds",
+	"numColumns":13,
+	"numRows":10,
+	"numBlue":10,
+	"numRed":10,
+	"numFree":30,
+	"acceptConditions":"ACCEPT: any color string with 3N + 2 \"red\" sections",
+	"mazeMaps":[{"exit":true,"path":["red","red","red","red","red"]},
+	{"exit":true,"path":["red","red"]},
+	{"exit":true,"path":["blue","red","blue","red","blue"]},
+	{"exit":false,"path":["blue","red","blue","red","red","red","blue","red","red","blue","red","blue","red","red","blue","blue"]}]
+}

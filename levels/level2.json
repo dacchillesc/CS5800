@@ -1,0 +1,12 @@
+{
+	"levelName":"Substring \"blue red red blue blue\" 2",
+	"numColumns":13,
+	"numRows":10,
+	"numBlue":10,
+	"numRed":10,
+	"numFree":30,
+	"acceptConditions":"ACCEPT: any color string with the substring \"blue red red blue blue\"",
+	"mazeMaps":[{"exit":true,"path":["blue","red","red","blue","blue"]},
+	{"exit":false,"path":["blue","red","blue","red","blue"]},
+	{"exit":true,"path":["blue","red","blue","red","red","red","blue","red","red","blue","red","blue","red","red","blue","blue"]}]
+}
