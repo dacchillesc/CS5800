@@ -1,13 +1,18 @@
 {
-	"levelName":"3N + 2 reds",
+	"levelName":"Odd number of \"blue\"",
 	"numColumns":13,
 	"numRows":10,
 	"numBlue":10,
 	"numRed":10,
 	"numFree":30,
-	"acceptConditions":"ACCEPT: any color string with 3N + 2 \"red\" sections",
-	"mazeMaps":[{"exit":true,"path":["red","red","red","red","red"]},
-	{"exit":true,"path":["red","red"]},
+	"numGoals":5,
+	"numDB":30,
+	"numDR":30,
+	"acceptConditions":"ACCEPT: any color string with an odd number of \"blue\" sections",
+	"mazeMaps":[{"exit":true,"path":["blue","blue","blue"]},
 	{"exit":true,"path":["blue","red","blue","red","blue"]},
-	{"exit":false,"path":["blue","red","blue","red","red","red","blue","red","red","blue","red","blue","red","red","blue","blue"]}]
+	{"exit":false,"path":["blue","blue"]},
+	{"exit":true,"path":["blue","red","blue","red","blue"]},
+	{"exit":false,"path":["blue","red","blue","red"]},
+	{"exit":true,"path":["blue","red","blue","red","red","red","blue","red","red","blue","red","blue","red","red","blue","blue"]}]
 }

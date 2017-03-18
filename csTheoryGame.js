@@ -13,6 +13,8 @@ function main(){
 	var levelIndex;
 	var mX;
 	var mY;
+	var mouseIsDown = false;
+	gameCanvas.addEventListener("mousedown", mouseButtonDown, false);
 	var chooseLevelButton = {"x":300,"y":250,"w":200,"h":100,"color":"DarkSlateGray"};
 	var nextLevelButton = {"x1":650,"y1":300,"x2":600,"y2":250,"x3":600,"y3":350,"color":"DarkSlateGray"};
 	var previousLevelButton = {"x1":150,"y1":300,"x2":200,"y2":250,"x3":200,"y3":350,"color":"DarkSlateGray"};
@@ -52,7 +54,23 @@ function main(){
 			}else
 			{ mDrawError("No levels found"); }
 		}).fail(function()
-		{ mDrawError("Could not access levels"); });
+		{ mDrawError("Could not access levels directory"); });
+	}
+	/*
+	 *
+	 */
+	function mouseButtonDown(e){
+		mouseIsDown = true;
+		gameCanvas.removeEventListener("mousedown", mouseButtonDown, false);
+		gameCanvas.addEventListener("mouseup", mouseButtonUp, false);
+	}
+	/*
+	 *
+	 */
+	function mouseButtonUp(e){
+		mouseIsDown = false;
+		gameCanvas.removeEventListener("mouseup", mouseButtonUp, false);
+		gameCanvas.addEventListener("mousedown", mouseButtonDown, false);
 	}
 	/*
 	 *
@@ -61,16 +79,31 @@ function main(){
 		var numBlue = data.numBlue;
 		var numRed = data.numRed;
 		var numFree = data.numFree;
+		var numGoals = data.numGoals;
+		var numDB = data.numDB;
+		var numDR = data.numDR;
 		var blueRed = numBlue + numRed;
-		var numTotal = blueRed + numFree;
+		var numDoors = blueRed + numFree;
+		var startPos = numDoors + 1;
+		var goalPos = startPos + numGoals;
+		var rlPos = goalPos + numDB;
+		var numTotal = rlPos + numDR;
 		var doors = [];
 		var i = 0;
 		for(; i < numBlue; i++)
 		{ doors[i] = {"x":50, "y":50, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"blue"}; }
 		for(; i < blueRed; i++)
 		{ doors[i] = {"x":50, "y":90, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"red"}; }
-		for(; i < numTotal; i++)
+		for(; i < numDoors; i++)
 		{ doors[i] = {"x":50, "y":130, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"green"}; }
+		doors[i] = {"x":50, "y":170, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"gold"};
+		i++;
+		for(;i < goalPos; i++)
+		{ doors[i] = {"x":90, "y":50, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"yellow"}; }
+		for(;i < rlPos; i++)
+		{ doors[i] = {"x":90, "y":90, "rad":6,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"darkBlue"}; }
+		for(;i < numTotal; i++)
+		{ doors[i] = {"x":90, "y":130, "rad":6,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"darkRed"}; }
 		return doors;
 	}
 	/*
@@ -88,15 +121,16 @@ function main(){
 	 *
 	 */
 	function mDrawError(errorText){
+		var recBorder = 50;
 		context.clearRect(0, 0, width, hight);
 		mDrawBackground();
 		context.fillStyle = 'red';
-		context.fillRect(50, 50, width - 100, hight - 100);
+		context.fillRect(recBorder, recBorder, width - (2 * recBorder), hight - (2 * recBorder));
 		context.font = "30px Georgia";
 		context.fillStyle = "black";
 		context.textAlign = "center";
 		context.textBaseline = "middle";
-		wrapText("ERROR: " + errorText + "!", width/2, height/2, width - 102);
+		wrapText("ERROR: " + errorText + "!", width/2, height/2, width - ((2 * recBorder) + 2));
 		context.textAlign = "start";
 		context.textBaseline = "alphabetic";
 	}
@@ -266,10 +300,17 @@ function main(){
 		var numBlue = levelConfig.numBlue;
 		var numRed = levelConfig.numRed;
 		var numFree = levelConfig.numFree;
+		var numGoals = levelConfig.numGoals;
+		var numDB = levelConfig.numDB;
+		var numDR = levelConfig.numDR;
 		var blueRed = numBlue + numRed;
-		var numTotal = blueRed + numFree;
-		var numColumns = levelConfig.numColumns;
-		var numRows = levelConfig.numRows;
+		var numDoors = blueRed + numFree;
+		var startPos = numDoors + 1;
+		var goalPos = startPos + numGoals;
+		var rlPos = goalPos + numDB;
+		var numTotal = rlPos + numDR;
+		var numColumns = 14;
+		var numRows = 10;
 		var numInWallColumns = numColumns - 1;
 		var numInWallRows = numRows - 1;
 		var numRight;
@@ -307,20 +348,27 @@ function main(){
 		var sh;
 		var si;
 		var sj;
-		init();
+		levInit();
 		/*
 		 *
 		 */
-		function init(){
-			initDoorFrames();
-			initDoorTypes();
-			for(var i = 0; i < numTotal; i++){
+		function levInit(){
+			levInitDoorFrames();
+			levInitDoorTypes();
+			var lenDoor = door.length
+			for(var i = 0; i < lenDoor; i++){
 				var curDoor = door[i];
 				var curDoorH = curDoor.h;
 				if(curDoorH === 1)
 				{ doorFrames[curDoor.i][curDoor.j].door = curDoor; }
 				else if(curDoorH === 2)
 				{ doorFrames2[curDoor.i][curDoor.j].door = curDoor; }
+				else if(curDoorH === 3)
+				{ rooms[curDoor.i][curDoor.j].door = curDoor; }
+				else if(curDoorH === 4)
+				{ rooms[curDoor.i][curDoor.j].bl = curDoor; }
+				else if(curDoorH === 5)
+				{ rooms[curDoor.i][curDoor.j].rl = curDoor; }
 			}
 			gameCanvas.addEventListener("mousedown", levelMouseDown, false);
 			window.addEventListener("keypress", keyPress, false);
@@ -329,20 +377,28 @@ function main(){
 		/*
 		 * 
 		 */
-		function initDoors(){
+		function levInitDoors(){
 			door = [];
 			var i = 0;
 			for(; i < numBlue; i++)
 			{ door[i] = {"x":50, "y":50, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"blue"}; }
 			for(; i < blueRed; i++)
 			{ door[i] = {"x":50, "y":90, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"red"}; }
-			for(; i < numTotal; i++)
+			for(; i < numDoors; i++)
 			{ door[i] = {"x":50, "y":130, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"green"}; }
+			door[i] = {"x":50, "y":170, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"gold"};
+			i++;
+			for(;i < goalPos; i++)
+			{ door[i] = {"x":90, "y":50, "rad":8,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"yellow"}; }
+			for(;i < rlPos; i++)
+			{ door[i] = {"x":90, "y":90, "rad":6,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"darkBlue"}; }
+			for(;i < numTotal; i++)
+			{ door[i] = {"x":90, "y":130, "rad":6,"d":true,"h":-1,"i":-1,"j":-1,"exitI":-1,"exitJ":-1,"enterI":-1,"enterJ":-1,"color":"darkRed"}; }
 		}
 		/*
 		 *
 		 */
-		function initDoorTypes(){
+		function levInitDoorTypes(){
 			var offset = 40;
 			var side = 20;
 			dTypes = [];
@@ -350,14 +406,24 @@ function main(){
 			colors[0] = "darkBlue";
 			colors[1] = "darkRed";
 			colors[2] = "darkGreen";
-			colors[3] = "orange";
-			for(var i = 0; i < 4; i++)
+			colors[3] = "gold";
+			colors[4] = "gold";
+			colors[5] = "blue";
+			colors[6] = "red";
+			colors[7] = "orange";
+			var i = 0;
+			var lenC = colors.length;
+			var hlenC = lenC/2;
+			for(; i < hlenC; i++)
 			{ dTypes[i] = {"x":offset,"y":offset + roomSize*i,"w":side,"h":side,"color":colors[i]}; }
+			var offr = offset + roomSize;
+			for(; i < lenC; i++)
+			{ dTypes[i] = {"x":offr,"y":offset + roomSize*(i - hlenC),"w":side,"h":side,"color":colors[i]}; }
 		}
 		/*
 		 *
 		 */
-		function initDoorFrames(){
+		function levInitDoorFrames(){
 			rooms = [];
 			doorFrames = [];
 			doorFrames2 = [];
@@ -365,7 +431,7 @@ function main(){
 			for(var i = 0; i < numRows; i++){
 				rooms[i] = [];
 				for(var j = 0; j < numColumns; j++)
-				{ rooms[i][j] = {"x":hStartX + (roomSize * j),"y":hStartY + (roomSize * i),"rad":10,"color":"yellow"}; }
+				{ rooms[i][j] = {"x":hStartX + (roomSize * j),"y":hStartY + (roomSize * i),"rad":10,"door":null,"bl":null,"rl":null,"color":"yellow"}; }
 			}
 			for(var i = 0; i < numRows; i++){
 				doorFrames[i] = [];
@@ -396,12 +462,10 @@ function main(){
 				removeDoor();
 				gameCanvas.addEventListener("mousemove", moveDoorDI, false);
 				gameCanvas.addEventListener("mouseup", placeDoorDI, false);
-			}else{
-				if(hitRectangleTest(runButton))
-				{ runMazeTests(); }
-				else
-				{ gameCanvas.addEventListener("mouseup", releaseMouse, false); }
-			}
+			}else if(hitRectangleTest(runButton))
+			{ runMazeTests(); }
+			else
+			{ gameCanvas.addEventListener("mouseup", releaseMouse, false); }
 			if (e.preventDefault)
 			{ e.preventDefault(); }
 			else if (e.returnValue)
@@ -412,7 +476,6 @@ function main(){
 		 *
 		 */
 		function releaseMouse(e){
-			getMousePosition(e);
 			gameCanvas.removeEventListener("mouseup", releaseMouse, false);
 			gameCanvas.addEventListener("mousedown", levelMouseDown, false);
 		}
@@ -428,6 +491,7 @@ function main(){
 			var h = xy.h;
 			var i = xy.i;
 			var j = xy.j;
+			var offset = 6;
 			if(h === 0){
 				var doorType = dTypes[i]
 				door[dI].x = doorType.x + (doorType.w)/2;
@@ -441,12 +505,25 @@ function main(){
 				door[dI].x = doorFrames2[i][j].x;
 				door[dI].y = doorFrames2[i][j].y;
 				addDoor(h,i,j);
+			}else if((h === 3)&&(rooms[i][j].door == null)){
+				door[dI].x = rooms[i][j].x;
+				door[dI].y = rooms[i][j].y;
+				addDoor(h,i,j);
+			}else if((h === 4)&&(rooms[i][j].bl == null)){
+				door[dI].x = rooms[i][j].x - offset;
+				door[dI].y = rooms[i][j].y + offset;
+				addDoor(h,i,j);
+			}else if((h === 5)&&(rooms[i][j].rl == null)){
+				door[dI].x = rooms[i][j].x + offset;
+				door[dI].y = rooms[i][j].y - offset;
+				addDoor(h,i,j);
 			}else{
 				door[dI].x = sX;
 				door[dI].y = sY;
 				door[dI].d = sd;
 				addDoor(sh,si,sj);
 			}
+			dI = -1;
 			gameCanvas.addEventListener("mousedown", levelMouseDown, false);
 		}
 		/*
@@ -459,17 +536,17 @@ function main(){
 			getMousePosition(e);
 			var pX = mX - dX;
 			var pY = mY - dY;
-			door[dI].x = (pX < sRad) ? sRad : ((pX > maxX) ? maxX : pX);
-			door[dI].y = (pY < sRad) ? sRad : ((pY > maxY) ? maxY : pY);
+			door[dI].x = Math.max(sRad,Math.min(maxX,pX));
+			door[dI].y = Math.max(sRad,Math.min(maxY,pY));
 		}
 		/*
 		 *
 		 */
 		function reInit(e){
 			gameCanvas.removeEventListener("mouseup", reInit, false);
-			initDoors();
-			initDoorFrames();
-			initDoorTypes();
+			levInitDoors();
+			levInitDoorFrames();
+			levInitDoorTypes();
 			gameCanvas.addEventListener("mousedown", levelMouseDown, false);
 		}
 		/*
@@ -520,6 +597,12 @@ function main(){
 					door[dI].exitI = i + 1;
 				}
 			}
+			else if(h === 3)
+			{ rooms[i][j].door = door[dI]; }
+			else if(h === 4)
+			{ rooms[i][j].bl = door[dI]; }
+			else if(h === 5)
+			{ rooms[i][j].rl = door[dI]; }
 		}
 		/*
 		 *
@@ -537,6 +620,12 @@ function main(){
 			{ doorFrames[si][sj].door = null; }
 			else if(sh === 2)
 			{ doorFrames2[si][sj].door = null; }
+			else if(sh === 3)
+			{ rooms[si][sj].door = null; }
+			else if(sh === 4)
+			{ rooms[si][sj].bl = null; }
+			else if(sh === 5)
+			{ rooms[si][sj].rl = null; }
 			door[dI].h = -1;
 			door[dI].i = -1;
 			door[dI].j = -1;
@@ -550,7 +639,8 @@ function main(){
 		 */
 		function hitDoorTest(){
 			d = false;
-			for(var i = 0; i < numTotal; i++){
+			var doorLen = door.length;
+			for(var i = 0; i < doorLen; i++){
 				if(hitCircleTest(door[i])){
 					d = true;
 					dI = i;
@@ -563,28 +653,82 @@ function main(){
 		 */
 		function hitFramesTest(){
 			var intColor = door[dI].color;
-			if(intColor === "blue")
-			{ intColor = 0; }
-			else if(intColor === "red")
-			{ intColor = 1; }
-			else
-			{ intColor = 2; }
-			var frad;
-			if(hitRectangleTest(dTypes[3]))
-			{ return {"h":0,"i":intColor,"j":-1}; }
-			for(var i = 0; i < numRows; i++){
-				for(var j = 0; j < numInWallColumns; j++){
-					if(hitCircleTest(doorFrames[i][j]))
-					{ return {"h":1,"i":i,"j":j}; }
-				}
-			}
-			for(var i = 0; i < numInWallRows; i++){
-				for(var j = 0; j < numColumns; j++){
-					if(hitCircleTest(doorFrames2[i][j]))
-					{ return {"h":2,"i":i,"j":j}; }
+			if(dI >= 0){
+				var numdoors = (dI < numDoors);
+				var goalpos = (dI < goalPos);
+				var rlpos = (dI < rlPos);
+				if(dI < numBlue)
+				{ intColor = 0; }
+				else if(dI < blueRed)
+				{ intColor = 1; }
+				else if(numdoors)
+				{ intColor = 2; }
+				else if(dI < startPos)
+				{ intColor = 3 }
+				else if(goalpos)
+				{ intColor = 4; }
+				else if(rlpos)
+				{ intColor = 5; }
+				else if(dI < numTotal)
+				{ intColor = 6; }
+				var frad;
+				var tIndex = dTypes.length - 1;
+				if(hitRectangleTest(dTypes[tIndex])){
+					return {"h":0,"i":intColor,"j":-1};
+				}else if(numdoors){
+					for(var i = 0; i < numRows; i++){
+						for(var j = 0; j < numInWallColumns; j++){
+							if(hitCircleTest(doorFrames[i][j]))
+							{ return {"h":1,"i":i,"j":j}; }
+						}
+					}
+					for(var i = 0; i < numInWallRows; i++){
+						for(var j = 0; j < numColumns; j++){
+							if(hitCircleTest(doorFrames2[i][j])){ return {"h":2,"i":i,"j":j}; }
+						}
+					}
+				}else{
+					var vWall = mid + 40;
+					var hWall = 20;
+					if((vWall <= mX) && (hWall <= mY)){
+						vWall += roomSize;
+						hWall += roomSize;
+						for(var i = 0; i < numRows; i++){
+							if(mY < hWall){
+								for(var j = 0; j < numColumns; j++){
+									if(mX < vWall){
+										var curH = 3;
+										if(!goalpos){
+											curH++;
+											if(!rlpos)
+											{ curH++; }
+										}
+										return {"h":curH,"i":i,"j":j};
+									}else
+									{ vWall += roomSize; }
+								}
+								break;
+							}else
+							{ hWall += roomSize; }
+						}
+					}
 				}
 			}
 			return {"h":-1,"i":-1,"j":-1};
+		}
+		/*
+		 *
+		 */
+		function heroAtExitTest(){
+			var useCorner = false;
+			for(var i = startPos; i < goalPos;i++){
+				var curDoor = door[i];
+				var uc = (curDoor.h === 3)
+				useCorner = useCorner || uc;
+				if(uc &&(hero.x === curDoor.x)&&(hero.y === curDoor.y))
+				{ return true; }
+			}
+			return useCorner && ((hero.x === (hStartX + roomSize * numInWallColumns))&&(hero.y === (hStartY + roomSize * numInWallRows)));
 		}
 		/*
 		 *
@@ -597,9 +741,10 @@ function main(){
 			var doJ;
 			var fdoI;
 			var fdoJ;
+			var checkDoor;
 			var startCheckDoor = 0;
 			var stopCheckDoor = 0;
-			for(checkDoor = blueRed; checkDoor < numTotal; checkDoor++){
+			for(checkDoor = blueRed; checkDoor < numDoors; checkDoor++){
 				doI = door[checkDoor].exitI;
 				doJ = door[checkDoor].exitJ;
 				if(i === doI && j === doJ){
@@ -610,7 +755,7 @@ function main(){
 				}
 			}
 			if(index >= map.path.length && freeDoor < 0){
-				var atExit = ((hero.x === (hStartX + roomSize * numInWallColumns))&&(hero.y === (hStartY + roomSize * numInWallRows)));
+				var atExit = heroAtExitTest();
 				var mapExit = map.exit;
 				if(mapExit && atExit){
 					numRight++;
@@ -625,7 +770,6 @@ function main(){
 				var goI;
 				var goJ;
 				var takeDoor = map.path[index];
-				var checkDoor;
 				var incrimentIndex = false;
 				if(takeDoor === "blue"){
 					startCheckDoor = 0;
@@ -649,9 +793,10 @@ function main(){
 				}
 				if(!incrimentIndex){
 					if(freeDoor < 0){
-						incIndex = true;
+						incIndex = (((takeDoor === "blue")&&(rooms[i][j].bl !== null))||((takeDoor === "red")&&(rooms[i][j].rl !== null)));
 						goI = fdoI;
 						goJ = fdoJ;
+						
 					}else{
 						incIndex = false;
 						goJ = door[freeDoor].enterJ;
@@ -675,6 +820,8 @@ function main(){
 					iY = hero.y - roomSize;
 					setTimeout(moveHeroUp,iter)
 				}else{
+					if((!incIndex) &&(freeDoor < 0))
+					{ index = map.path.length; }
 					var timout = 40 * iter;
 					setTimeout(noMoveHero,timout);
 				}
@@ -737,10 +884,12 @@ function main(){
 		 *
 		 */
 		function runMazeTests(){
+			window.cancelAnimationFrame(animate);
 			r = true;
 			mapIndex = -1;
 			dI = -1;
 			numRight = 0;
+			animate = window.requestAnimationFrame(drawRunScreen);
 			runNextMap();
 		}
 		/*
@@ -759,22 +908,35 @@ function main(){
 			var numMaps = mazeMaps.length;
 			if(mapIndex < numMaps){
 				statusString = "go";
-				hero.x = hStartX;
-				hero.y = hStartY;
-				hero.i = 0;
-				hero.j = 0;
+				var startDoor = door[numDoors];
+				if(startDoor.h == 3){
+					hero.x = startDoor.x;
+					hero.y = startDoor.y;
+					hero.i = startDoor.i;
+					hero.j = startDoor.j;
+				}else{
+					hero.x = hStartX;
+					hero.y = hStartY;
+					hero.i = 0;
+					hero.j = 0;
+				}
 				iX = 0;
 				iY = 0;
 				map = mazeMaps[mapIndex];
 				index = 0;
 				setTimeout(navigateMaze,50 * iter);;
 			}else{
-				if(numRight == numMaps){
-					statusString = "All tests pased!  The maze is correct!";
-				}else
+				window.cancelAnimationFrame(animate);
+				if(numRight == numMaps)
+				{ statusString = "All tests pased!  The maze is correct!"; }
+				else
 				{ statusString = "Only " + numRight + " out of " + numMaps + " are correct.  This is not the correct maze"; }
 				map = null;
-				gameCanvas.addEventListener("mouseup", releaseMouse, false);
+				if(mouseIsDown)
+				{ gameCanvas.addEventListener("mouseup", releaseMouse, false); }
+				else
+				{ gameCanvas.addEventListener("mousedown", levelMouseDown, false); }
+				animate = window.requestAnimationFrame(drawScreen);
 			}
 		}
 		/*
@@ -782,13 +944,14 @@ function main(){
 		 */
 		function drawBackground(){
 			var hmm = hight - (mid + 2);
+			var border = 1;
 			var leftBorder = 15;
 			context.fillStyle = 'gray';
 			context.fillRect(0, 0, width, hight);
 			context.beginPath();
-			context.rect(1, 1, mid, hmm);
-			context.rect(mid, 1, width - mid, hmm);
-			context.rect(1, hight-mid, width - 2, mid - 1);
+			context.rect(border, border, mid, hmm);
+			context.rect(mid, border, width - mid, hmm);
+			context.rect(border, hight-mid, width - 2 * border, mid - border);
 			context.closePath();
 			context.lineWidth = 7;
 			context.strokeStyle = 'black';
@@ -801,7 +964,7 @@ function main(){
 			context.font = "16px Georgia";
 			context.fillText(acceptConditions, leftBorder, hight-(mid-80));
 			context.fillText(statusString, leftBorder, hight -(mid - 120));
-			if(dI >= 0){
+			if((dI >= 0)&&(dI < numDoors)){
 				var stateString;
 				var ddIh = door[dI].h;
 				if(ddIh === 1){
@@ -852,7 +1015,8 @@ function main(){
 		 *
 		 */
 		function drawDoorTypes(){
-			for(var i = 0; i < 4; i++){
+			var dtLen = dTypes.length;
+			for(var i = 0; i < dtLen; i++){
 				context.fillStyle = dTypes[i].color;
 				context.fillRect(dTypes[i].x, dTypes[i].y, dTypes[i].w, dTypes[i].h);
 			}
@@ -892,11 +1056,22 @@ function main(){
 			drawDoorTypes();
 			drawGrid();
 			drawDoors();
-			if(r){
-				mDrawCircle(hero);
-				drawPath();
-			}
+			if(r)
+			{ mDrawCircle(hero); }
 			animate = window.requestAnimationFrame(drawScreen);
+		}
+		/*
+		 *
+		 */
+		function drawRunScreen(){
+			context.clearRect(0, 0, width, hight);
+			drawBackground();
+			drawDoorTypes();
+			drawGrid();
+			drawDoors();
+			mDrawCircle(hero);
+			drawPath();
+			animate = window.requestAnimationFrame(drawRunScreen);
 		}
 		/*
 		 *
@@ -911,7 +1086,8 @@ function main(){
 		 *
 		 */
 		function drawDoors(){
-			for(var i = 0; i < numTotal;i++)
+			var doorLen = door.length;
+			for(var i = 0; i < doorLen;i++)
 			{ drawDoor(i); }
 			if(dI >= 0)
 			{ drawDoor(dI); }	

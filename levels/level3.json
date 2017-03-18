@@ -1,18 +1,18 @@
 {
-	"levelName":"String \"blue red red blue blue\"",
+	"levelName":"Repition of the substring \"blue red red blue blue\"",
 	"numColumns":13,
 	"numRows":10,
 	"numBlue":10,
 	"numRed":10,
 	"numFree":30,
-	"acceptConditions":"ACCEPT: Only the string \"blue red red blue blue\"",
+	"numGoals":5,
+	"numDB":30,
+	"numDR":30,
+	"acceptConditions":"ACCEPT: any color string made up of copies of the substring \"blue red red blue blue\"",
 	"mazeMaps":[{"exit":true,"path":["blue","red","red","blue","blue"]},
-	{"exit":false,"path":["blue","red","red","blue","blue","blue","red","red","blue","blue"]},
-	{"exit":false,"path":["blue","red","red","blue","blue","red"]},
-	{"exit":false,"path":["red","red","red","blue","blue"]},
-	{"exit":false,"path":["blue","red","red","blue","blue","blue"]},
-	{"exit":false,"path":["blue","blue","red","blue","blue"]},
-	{"exit":false,"path":["blue","red","blue","blue","blue"]},
-	{"exit":false,"path":["blue","red","red","blue","red"]},
-	{"exit":false,"path":["blue","red","blue","red","blue"]}]
+	{"exit":false,"path":["blue","red","blue","red","blue"]},
+	{"exit":false,"path":["blue","red","red","blue","blue","blue","red","red","blue","red"]},
+	{"exit":true,"path":["blue","red","red","blue","blue","blue","red","red","blue","blue"]},
+	{"exit":false,"path":["blue","red","red","blue","blue","blue","red","red"]},
+	{"exit":true,"path":["blue","red","red","blue","blue","blue","red","red","blue","blue","blue","red","red","blue","blue"]}]
 }
