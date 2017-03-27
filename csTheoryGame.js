@@ -5,6 +5,8 @@ window.addEventListener("load", main, false);
 function main(){
 	var gameCanvas = document.getElementById('gameCanvas');
 	var context = gameCanvas.getContext("2d");
+	var img = new Image();
+	img.src = "sprites.png";
 	var anamate;
 	var width = gameCanvas.width;
 	var hight = gameCanvas.height;
@@ -14,6 +16,7 @@ function main(){
 	var mX;
 	var mY;
 	var mouseIsDown = false;
+	
 	gameCanvas.addEventListener("mousedown", mouseButtonDown, false);
 	var chooseLevelButton = {"x":300,"y":250,"w":200,"h":100,"color":"DarkSlateGray"};
 	var nextLevelButton = {"x1":650,"y1":300,"x2":600,"y2":250,"x3":600,"y3":350,"color":"DarkSlateGray"};
@@ -720,12 +723,12 @@ function main(){
 		 *
 		 */
 		function heroAtExitTest(){
-			var useCorner = false;
+			var useCorner = true;
 			for(var i = startPos; i < goalPos;i++){
 				var curDoor = door[i];
-				var uc = (curDoor.h === 3)
-				useCorner = useCorner || uc;
-				if(uc &&(hero.x === curDoor.x)&&(hero.y === curDoor.y))
+				var uc = (curDoor.h !== 3)
+				useCorner = useCorner && uc;
+				if((!uc) &&(hero.x === curDoor.x)&&(hero.y === curDoor.y))
 				{ return true; }
 			}
 			return useCorner && ((hero.x === (hStartX + roomSize * numInWallColumns))&&(hero.y === (hStartY + roomSize * numInWallRows)));
@@ -759,22 +762,27 @@ function main(){
 				var mapExit = map.exit;
 				if(mapExit && atExit){
 					numRight++;
-					statusString = "sucess: valid map got hero to exit.";
-				}else if(!(mapExit || atExit)){
+					statusString = "sucess: valid map got hero to an exit.";
+				}else if(atExit){
+					statusString = "fail: invalid map left hero at an exit.";
+				}else if(mapExit){
+					statusString = "fail: valid map left hero away from exit.";
+				}else{
 					numRight++;
 					statusString = "sucess: invalid map left hero away from exit.";
-				}else
-				{ statusString = "fail"; }
+				}
 				setTimeout(runNextMap,200 * iter);
 			}else{
 				var goI;
 				var goJ;
 				var takeDoor = map.path[index];
 				var incrimentIndex = false;
-				if(takeDoor === "blue"){
+				var tb = (takeDoor === "blue");
+				var tr = (takeDoor === "red");
+				if(tb){
 					startCheckDoor = 0;
 					stopCheckDoor = numBlue;
-				}else if(takeDoor === "red"){
+				}else if(tr){
 					startCheckDoor = numBlue;
 					stopCheckDoor = blueRed;
 				}
@@ -793,7 +801,7 @@ function main(){
 				}
 				if(!incrimentIndex){
 					if(freeDoor < 0){
-						incIndex = (((takeDoor === "blue")&&(rooms[i][j].bl !== null))||((takeDoor === "red")&&(rooms[i][j].rl !== null)));
+						incIndex = ((tb&&(rooms[i][j].bl !== null))||(tr&&(rooms[i][j].rl !== null)));
 						goI = fdoI;
 						goJ = fdoJ;
 						
@@ -964,27 +972,6 @@ function main(){
 			context.font = "16px Georgia";
 			context.fillText(acceptConditions, leftBorder, hight-(mid-80));
 			context.fillText(statusString, leftBorder, hight -(mid - 120));
-			if((dI >= 0)&&(dI < numDoors)){
-				var stateString;
-				var ddIh = door[dI].h;
-				if(ddIh === 1){
-					if(door[dI].d)
-					{ stateString = "right"; }
-					else
-					{ stateString = "left"; }
-				}else if(ddIh === 2){
-					if(door[dI].d)
-					{ stateString = "down"; }
-					else
-					{ stateString = "up"; }
-				}else{
-					if(door[dI].d)
-					{ stateString = "right/down"; }
-					else
-					{ stateString = "left/up"; }
-				}
-				context.fillText(stateString, leftBorder, runButton.y - 19);
-			}
 		}
 		/*
 		 *
@@ -1077,10 +1064,30 @@ function main(){
 		 *
 		 */
 		function drawDoor(i){
-			mDrawCircle(door[i]);
-			context.strokeStyle = "black";
-			context.lineWidth = 1;
-			context.stroke();
+			if(i < numDoors){
+				var curDoor = door[i];
+				var curRad = curDoor.rad;
+				var side = 2 * curRad;
+				var yIndex = 32;
+				if(i < numBlue)
+				{ yIndex = 0; }
+				else if(i < blueRed)
+				{ yIndex = 16; }
+				curDoorH = curDoor.h;
+				var xIndex = 0;
+				if(curDoorH >= 0)
+				{ xIndex = 2 * curDoorH; }
+				if(curDoor.d)
+				{ xIndex++; }
+				xIndex = xIndex * side;
+				context.drawImage(img,xIndex,yIndex,side,side,curDoor.x - curRad,curDoor.y - curRad,side,side);
+			}else{
+				mDrawCircle(door[i]);
+				context.strokeStyle = "black";
+				context.lineWidth = 1;
+				context.stroke();
+			}
+			
 		}
 		/*
 		 *
