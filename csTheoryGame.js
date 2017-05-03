@@ -121,7 +121,7 @@ function main(){
 		animate = window.requestAnimationFrame(mDrawScreen);
 	}
 	/*
-	 *
+	 * 
 	 */
 	function mDrawError(errorText){
 		var recBorder = 50;
@@ -138,7 +138,7 @@ function main(){
 		context.textBaseline = "alphabetic";
 	}
 	/*
-	 *
+	 * Handles drawing of triangular button
 	 */
 	function mDrawTriangleButton(triangle){
 		context.beginPath();
@@ -153,8 +153,7 @@ function main(){
 		context.stroke();
 	}
 	/*
-	 * 
-	 * 
+	 * Handles drawing of circles.
 	 */
 	function mDrawCircle(circle){
 		context.beginPath();
@@ -164,22 +163,7 @@ function main(){
 		context.fill();
 	}
 	/*
-	 *
-	 * 
-	 */
-	function mDrawBackground(){
-		context.fillStyle = 'gray';
-		context.fillRect(0, 0, width, hight);
-		context.beginPath();
-		context.rect(1, 1, width - 2, hight - 2);
-		context.closePath();
-		context.lineWidth = 7;
-		context.strokeStyle = 'black';
-		context.stroke();
-	}
-	/*
-	 *
-	 * 
+	 * Handles drawing of buttons with a rectangular shape.
 	 */
 	function mDrawRectangularButton(recButton,recText){
 		var x = recButton.x;
@@ -204,6 +188,20 @@ function main(){
 	}
 	/*
 	 *
+	 * 
+	 */
+	function mDrawBackground(){
+		context.fillStyle = 'gray';
+		context.fillRect(0, 0, width, hight);
+		context.beginPath();
+		context.rect(1, 1, width - 2, hight - 2);
+		context.closePath();
+		context.lineWidth = 7;
+		context.strokeStyle = 'black';
+		context.stroke();
+	}
+	/*
+	 * Checks if mouse is within area fo given triangle
 	 */
 	function hitTriangleTest(triangle){
 		var x1 = triangle.x1;
@@ -218,7 +216,7 @@ function main(){
 		return ((((x3-x1)*m1y-(y3-y1)*m1x > 0) != m12) && (((x3-x2)*(mY-y2)-(y3-y2)*(mX-x2) > 0) == m12));
 	}
 	/*
-	 *
+	 * Checks if mouse is within area of given rectangle
 	 */
 	function hitRectangleTest(rectangle){
 		var fx = mX - rectangle.x;
@@ -226,7 +224,7 @@ function main(){
 		return (fx > 0 && fx < rectangle.w && fy > 0 && fy < rectangle.h);
 	}
 	/*
-	 *
+	 * Checks if mouse is within area of the given circle
 	 */
 	function hitCircleTest(circle){
 		var fx = mX - circle.x;
@@ -406,7 +404,7 @@ function main(){
 			var side = 20;
 			dTypes = [];
 			var colors = [];
-			colors[0] = "darkBlue";
+			colors[0] = "aqua";
 			colors[1] = "darkRed";
 			colors[2] = "darkGreen";
 			colors[3] = "gold";
@@ -530,7 +528,7 @@ function main(){
 			gameCanvas.addEventListener("mousedown", levelMouseDown, false);
 		}
 		/*
-		 *
+		 * Handles the tracking of the mouse when it is draging a "door".
 		 */
 		function moveDoorDI(e){
 			var sRad = door[dI].rad;
@@ -828,9 +826,12 @@ function main(){
 					iY = hero.y - roomSize;
 					setTimeout(moveHeroUp,iter)
 				}else{
-					if((!incIndex) &&(freeDoor < 0))
-					{ index = map.path.length; }
-					var timout = 40 * iter;
+					var timMult = 1;
+					if((!incIndex)&&(freeDoor < 0)){
+						index = map.path.length;
+						timMult = 40;
+					}
+					var timout = timMult * iter;
 					setTimeout(noMoveHero,timout);
 				}
 			}
@@ -1086,8 +1087,10 @@ function main(){
 				context.strokeStyle = "black";
 				context.lineWidth = 1;
 				context.stroke();
+				if(i == numDoors){
+					
+				}
 			}
-			
 		}
 		/*
 		 *

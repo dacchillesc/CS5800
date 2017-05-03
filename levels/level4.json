@@ -1,7 +1,5 @@
 {
 	"levelName":"3N + 2 reds",
-	"numColumns":13,
-	"numRows":10,
 	"numBlue":10,
 	"numRed":10,
 	"numFree":30,

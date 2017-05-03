@@ -1,7 +1,5 @@
 {
 	"levelName":"Repition of the substring \"blue red red blue blue\"",
-	"numColumns":13,
-	"numRows":10,
 	"numBlue":10,
 	"numRed":10,
 	"numFree":30,

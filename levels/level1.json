@@ -1,7 +1,5 @@
 {
 	"levelName":"Substring \"blue red red blue blue\"",
-	"numColumns":5,
-	"numRows":3,
 	"numBlue":10,
 	"numRed":10,
 	"numFree":30,
